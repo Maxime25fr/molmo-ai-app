@@ -32,11 +32,6 @@ st.markdown("""
         font-family: 'Inter', sans-serif;
         text-align: center;
     }
-    .model-header {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
     .model-desc {
         font-size: 0.9em;
         color: #8b949e;
@@ -55,16 +50,15 @@ st.markdown("""
         background-color: #00a3cc;
         color: #ffffff;
     }
-    /* Style pour le bouton de copie */
-    .copy-btn {
-        background: none;
-        border: none;
-        color: #00d4ff;
-        cursor: pointer;
-        font-size: 1.2em;
-        padding: 0;
-        display: flex;
-        align-items: center;
+    /* Style pour le texte de la clé */
+    .key-display {
+        font-family: monospace;
+        font-size: 0.8em;
+        background-color: #0e1117;
+        padding: 5px;
+        border-radius: 5px;
+        border: 1px solid #30363d;
+        word-break: break-all;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -102,17 +96,14 @@ with st.sidebar:
     # Récupération de la clé API via les Secrets Streamlit
     api_key = st.secrets.get(model_info["secret_key"])
     
-    # Affichage du nom avec bouton de copie
-    col1, col2 = st.columns([0.8, 0.2])
-    with col1:
-        st.markdown(f"**Modèle : {selected_model_name}**")
-    with col2:
-        if api_key:
-            # Utilisation de st.code pour permettre la copie facile ou un bouton dédié
-            st.copy_to_clipboard(api_key)
-            st.button("📋", help="Copier la clé API", key="copy_btn")
-        else:
-            st.markdown("⚠️")
+    st.markdown(f"**Modèle : {selected_model_name}**")
+    
+    if api_key:
+        # Utilisation de st.code qui inclut nativement un bouton de copie robuste
+        st.markdown("Clé API (cliquez pour copier) :")
+        st.code(api_key, language="text")
+    else:
+        st.error("⚠️ Clé non configurée")
 
     st.markdown(f"<div class='model-desc'>{model_info['desc']}</div>", unsafe_allow_html=True)
     
@@ -128,7 +119,7 @@ with st.sidebar:
         st.rerun()
 
 if not api_key:
-    st.error(f"La clé API pour {selected_model_name} n'est pas configurée dans les Secrets Streamlit. Veuillez l'ajouter dans les paramètres 'Advanced' de Streamlit Cloud.")
+    st.error(f"La clé API pour {selected_model_name} n'est pas configurée dans les Secrets Streamlit.")
     st.stop()
 
 # Initialisation du client
