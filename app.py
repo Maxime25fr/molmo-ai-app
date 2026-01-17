@@ -32,6 +32,11 @@ st.markdown("""
         font-family: 'Inter', sans-serif;
         text-align: center;
     }
+    .model-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
     .model-desc {
         font-size: 0.9em;
         color: #8b949e;
@@ -50,10 +55,21 @@ st.markdown("""
         background-color: #00a3cc;
         color: #ffffff;
     }
+    /* Style pour le bouton de copie */
+    .copy-btn {
+        background: none;
+        border: none;
+        color: #00d4ff;
+        cursor: pointer;
+        font-size: 1.2em;
+        padding: 0;
+        display: flex;
+        align-items: center;
+    }
     </style>
     """, unsafe_allow_html=True)
 
-# Configuration des modèles (Les clés sont récupérées via st.secrets)
+# Configuration des modèles
 MODELS_CONFIG = {
     "Molmo 2 8B": {
         "id": "allenai/molmo-2-8b:free",
@@ -82,6 +98,22 @@ with st.sidebar:
     )
     
     model_info = MODELS_CONFIG[selected_model_name]
+    
+    # Récupération de la clé API via les Secrets Streamlit
+    api_key = st.secrets.get(model_info["secret_key"])
+    
+    # Affichage du nom avec bouton de copie
+    col1, col2 = st.columns([0.8, 0.2])
+    with col1:
+        st.markdown(f"**Modèle : {selected_model_name}**")
+    with col2:
+        if api_key:
+            # Utilisation de st.code pour permettre la copie facile ou un bouton dédié
+            st.copy_to_clipboard(api_key)
+            st.button("📋", help="Copier la clé API", key="copy_btn")
+        else:
+            st.markdown("⚠️")
+
     st.markdown(f"<div class='model-desc'>{model_info['desc']}</div>", unsafe_allow_html=True)
     
     st.divider()
@@ -95,11 +127,8 @@ with st.sidebar:
         st.session_state.messages = []
         st.rerun()
 
-# Récupération de la clé API via les Secrets Streamlit
-api_key = st.secrets.get(model_info["secret_key"])
-
 if not api_key:
-    st.error(f"La clé API pour {selected_model_name} n'est pas configurée dans les Secrets Streamlit.")
+    st.error(f"La clé API pour {selected_model_name} n'est pas configurée dans les Secrets Streamlit. Veuillez l'ajouter dans les paramètres 'Advanced' de Streamlit Cloud.")
     st.stop()
 
 # Initialisation du client
