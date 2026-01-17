@@ -50,16 +50,6 @@ st.markdown("""
         background-color: #00a3cc;
         color: #ffffff;
     }
-    /* Style pour le texte de la clé */
-    .key-display {
-        font-family: monospace;
-        font-size: 0.8em;
-        background-color: #0e1117;
-        padding: 5px;
-        border-radius: 5px;
-        border: 1px solid #30363d;
-        word-break: break-all;
-    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -67,12 +57,10 @@ st.markdown("""
 MODELS_CONFIG = {
     "Molmo 2 8B": {
         "id": "allenai/molmo-2-8b:free",
-        "secret_key": "MOLMO_KEY",
         "desc": "Un modèle multimodal ultra-performant capable de comprendre et d'analyser des images avec une précision exceptionnelle. Idéal pour la vision par ordinateur et les descriptions détaillées."
     },
     "MiMo": {
         "id": "mistralai/mistral-7b-instruct:free",
-        "secret_key": "MIMO_KEY",
         "desc": "Un modèle optimisé pour la rapidité et l'efficacité textuelle. Excellent pour le raisonnement logique, la rédaction et les conversations fluides."
     }
 }
@@ -81,6 +69,9 @@ def encode_image(image):
     buffered = io.BytesIO()
     image.save(buffered, format="PNG")
     return base64.b64encode(buffered.getvalue()).decode('utf-8')
+
+# Récupération de la clé API unique via les Secrets Streamlit
+api_key = st.secrets.get("OPENROUTER_API_KEY")
 
 # Barre latérale
 with st.sidebar:
@@ -93,18 +84,7 @@ with st.sidebar:
     
     model_info = MODELS_CONFIG[selected_model_name]
     
-    # Récupération de la clé API via les Secrets Streamlit
-    api_key = st.secrets.get(model_info["secret_key"])
-    
-    st.markdown(f"**Modèle : {selected_model_name}**")
-    
-    if api_key:
-        # Utilisation de st.code qui inclut nativement un bouton de copie robuste
-        st.markdown("Clé API (cliquez pour copier) :")
-        st.code(api_key, language="text")
-    else:
-        st.error("⚠️ Clé non configurée")
-
+    st.markdown(f"**Modèle sélectionné : {selected_model_name}**")
     st.markdown(f"<div class='model-desc'>{model_info['desc']}</div>", unsafe_allow_html=True)
     
     st.divider()
@@ -119,7 +99,7 @@ with st.sidebar:
         st.rerun()
 
 if not api_key:
-    st.error(f"La clé API pour {selected_model_name} n'est pas configurée dans les Secrets Streamlit.")
+    st.error("La clé API n'est pas configurée dans les Secrets Streamlit. Veuillez l'ajouter dans les paramètres 'Advanced' sous le nom OPENROUTER_API_KEY.")
     st.stop()
 
 # Initialisation du client
