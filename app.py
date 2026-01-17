@@ -53,16 +53,16 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# Configuration des modèles et clés
+# Configuration des modèles (Les clés sont récupérées via st.secrets)
 MODELS_CONFIG = {
     "Molmo 2 8B": {
         "id": "allenai/molmo-2-8b:free",
-        "key": "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",
+        "secret_key": "MOLMO_KEY",
         "desc": "Un modèle multimodal ultra-performant capable de comprendre et d'analyser des images avec une précision exceptionnelle. Idéal pour la vision par ordinateur et les descriptions détaillées."
     },
     "MiMo": {
-        "id": "mistralai/mistral-7b-instruct:free", # Note: MiMo est souvent associé à Mistral sur OpenRouter free, j'utilise l'ID correspondant
-        "key": "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",
+        "id": "mistralai/mistral-7b-instruct:free",
+        "secret_key": "MIMO_KEY",
         "desc": "Un modèle optimisé pour la rapidité et l'efficacité textuelle. Excellent pour le raisonnement logique, la rédaction et les conversations fluides."
     }
 }
@@ -95,10 +95,17 @@ with st.sidebar:
         st.session_state.messages = []
         st.rerun()
 
-# Initialisation du client pour le modèle sélectionné
+# Récupération de la clé API via les Secrets Streamlit
+api_key = st.secrets.get(model_info["secret_key"])
+
+if not api_key:
+    st.error(f"La clé API pour {selected_model_name} n'est pas configurée dans les Secrets Streamlit.")
+    st.stop()
+
+# Initialisation du client
 client = OpenAI(
     base_url="https://openrouter.ai/api/v1",
-    api_key=model_info["key"],
+    api_key=api_key,
 )
 
 # Interface principale
@@ -122,7 +129,7 @@ if prompt := st.chat_input("Posez votre question ici..."):
         message_placeholder = st.empty()
         full_response = ""
         
-        # Préparation du contenu (multimodal pour Molmo, texte pour les autres)
+        # Préparation du contenu
         if selected_model_name == "Molmo 2 8B" and uploaded_file:
             content = [
                 {"type": "text", "text": prompt},
