@@ -106,7 +106,7 @@ MODELS_CONFIG = {
         "vision": True
     },
     "MiMo": {
-        "id": "mistralai/mistral-7b-instruct:free",
+        "id": "mistralai/mistral-7b-instruct",
         "desc": "L'expert en texte. Optimisé pour des réponses rapides, précises et un raisonnement logique fluide.",
         "vision": False
     }
