@@ -105,9 +105,9 @@ MODELS_CONFIG = {
         "desc": "L'expert en vision. Capable d'analyser, décrire et comprendre vos images avec une précision chirurgicale.",
         "vision": True
     },
-    "MiMo": {
-        "id": "mistralai/mistral-7b-instruct",
-        "desc": "L'expert en texte. Optimisé pour des réponses rapides, précises et un raisonnement logique fluide.",
+    "GPT-OSS-120B": {
+        "id": "deepseek/deepseek-chat",
+        "desc": "Le titan du texte. Un modèle massif de 120B+ paramètres, exceptionnel pour la génération de contenu complexe, le code et le raisonnement profond.",
         "vision": False
     }
 }
@@ -162,7 +162,7 @@ with st.sidebar:
             image = Image.open(uploaded_file)
             st.image(image, caption="Image chargée", use_container_width=True)
     else:
-        st.info("💡 Seul Molmo 2 8B supporte l'analyse d'images.")
+        st.info("💡 GPT-OSS-120B est un expert textuel pur. Utilisez Molmo 2 8B pour l'analyse d'images.")
     
     st.spacer = st.empty()
     st.divider()
